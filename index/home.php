@@ -22,7 +22,7 @@ session_start();
     <div class="container text-center">
       <h1 class="display-4 fw-bold">Delicious Food Delivered Fast</h1>
       <p class="lead">Order your favorite meals anytime, anywhere!</p>
-      <a href="food_menu.php" class="btn btn-danger btn-lg mt-3">Browse Menu</a>
+      <a href="foodmenu.php" class="btn btn-danger btn-lg mt-3">Browse Menu</a>
     </div>
   </header>
 
