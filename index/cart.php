@@ -9,7 +9,7 @@
 </head>
 <body>
 
-<?php include ("../index/navbar.php"); ?>
+  <?php include ("../index/navbar.php"); ?>
 
   <!-- Cart Section -->
   <section class="py-5 cart-section">
@@ -40,6 +40,6 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../js/cart.js"></script>
 
-<?php include ("../index/footer.php"); ?>
+  <?php include ("../index/footer.php"); ?>
 </body>
 </html>
