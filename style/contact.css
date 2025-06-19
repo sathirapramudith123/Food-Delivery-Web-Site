@@ -1,0 +1,16 @@
+.contact-section {
+  background-color: #fefefe;
+}
+
+.contact-section h2 {
+  color: #dc3545;
+}
+
+#contactForm input, #contactForm textarea {
+  border-radius: 5px;
+}
+
+#contactForm button {
+  background-color: #dc3545;
+  border: none;
+}
