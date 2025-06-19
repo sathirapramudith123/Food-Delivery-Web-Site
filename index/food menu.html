@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Menu - FoodExpress</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="../style/food menu.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">FoodExpress</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+          <li class="nav-item"><a class="nav-link active" href="#">Menu</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Menu Section -->
+  <section class="menu-section py-5">
+    <div class="container">
+      <h2 class="text-center text-danger mb-4">Our Delicious Menu</h2>
+      <div class="text-end mb-4">
+            <center>
+                <input type="text" id="searchInput" class="form-control d-inline w-25" placeholder="Search food..." onkeyup="searchMenu()" />
+            </center>
+      </div>
+      <div class="text-end mb-4">
+                <a href="./add food menu form.html" class="btn btn-danger">Add Food Item</a>
+      </div>
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+
+        <!-- Food Item 1 -->
+        <div class="col">
+          <div class="card h-100">
+            <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Pizza">
+            <div class="card-body">
+              <h5 class="card-title">Margherita Pizza</h5>
+              <p class="card-text">Classic pizza with tomato, mozzarella, and basil.</p>
+              <p class="text-danger fw-bold">$8.99</p>
+              <a href="#" class="btn btn-danger w-100">Add to Cart</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Food Item 2 -->
+        <div class="col">
+          <div class="card h-100">
+            <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Burger">
+            <div class="card-body">
+              <h5 class="card-title">Beef Burger</h5>
+              <p class="card-text">Juicy beef patty with lettuce, tomato, and cheese.</p>
+              <p class="text-danger fw-bold">$6.49</p>
+              <a href="#" class="btn btn-danger w-100">Add to Cart</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Food Item 3 -->
+        <div class="col">
+          <div class="card h-100">
+            <img src="https://via.placeholder.com/300x200" class="card-img-top" alt="Sushi">
+            <div class="card-body">
+              <h5 class="card-title">Sushi Platter</h5>
+              <p class="card-text">Assorted sushi rolls with soy sauce and wasabi.</p>
+              <p class="text-danger fw-bold">$12.99</p>
+              <a href="#" class="btn btn-danger w-100">Add to Cart</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add more food cards as needed -->
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white text-center py-3">
+    <p class="mb-0">&copy; 2025 FoodExpress. All rights reserved.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/food menu.js"></script>
+</body>
+</html>

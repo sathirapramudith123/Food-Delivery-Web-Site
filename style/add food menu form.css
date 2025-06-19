@@ -1,0 +1,11 @@
+.form-section {
+  background-color: #f8f9fa;
+}
+
+.form-section h2 {
+  color: #dc3545;
+}
+
+form input, form textarea, form select {
+  border-radius: 5px;
+}

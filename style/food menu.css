@@ -1,0 +1,12 @@
+.menu-section {
+  background-color: #f8f9fa;
+}
+
+.card-title {
+  color: #dc3545;
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
