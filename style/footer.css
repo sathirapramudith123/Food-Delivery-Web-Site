@@ -1,0 +1,11 @@
+footer {
+  font-size: 0.95rem;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+.social-icons i {
+  font-size: 1.2rem;
+}
