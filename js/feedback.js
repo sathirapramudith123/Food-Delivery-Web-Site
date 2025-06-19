@@ -1,84 +1,69 @@
 document.addEventListener('DOMContentLoaded', () => {
-  let selectedRating = 0;
-  let editMode = false;
-  let editTarget = null;
-
-  const stars = document.querySelectorAll('.fa-star');
-  const commentInput = document.getElementById('comment');
-  const feedbackForm = document.getElementById('feedbackForm');
+  const form = document.getElementById('feedbackForm');
   const feedbackList = document.getElementById('feedbackList');
+  let selectedRating = 0;
 
-  // Handle star rating selection
-  stars.forEach(star => {
-    star.addEventListener('click', function () {
-      selectedRating = parseInt(this.getAttribute('data-rating'));
+  // Star rating selection
+  document.querySelectorAll('.fa-star').forEach(star => {
+    star.addEventListener('click', () => {
+      selectedRating = parseInt(star.dataset.rating);
       updateStars(selectedRating);
     });
   });
 
   function updateStars(rating) {
-    stars.forEach((s, index) => {
-      s.classList.toggle('checked', index < rating);
+    document.querySelectorAll('.fa-star').forEach(star => {
+      star.classList.toggle('checked', parseInt(star.dataset.rating) <= rating);
     });
   }
 
-  // Handle form submission
-  feedbackForm.addEventListener('submit', function (e) {
+  // Load existing feedback on page load
+  loadFeedback();
+
+  function loadFeedback() {
+    fetch('feedback_handler.php?action=read')
+      .then(res => res.json())
+      .then(data => {
+        feedbackList.innerHTML = '';
+        data.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'list-group-item';
+          div.innerHTML = `
+            <p>${item.comment}</p>
+            <p>Rating: ${'⭐'.repeat(item.rating)}</p>
+            <small>${new Date(item.created_at).toLocaleString()}</small>
+          `;
+          feedbackList.appendChild(div);
+        });
+      });
+  }
+
+  form.addEventListener('submit', e => {
     e.preventDefault();
-    const comment = commentInput.value.trim();
+    const comment = document.getElementById('comment').value.trim();
     if (!comment || selectedRating === 0) {
-      alert('Please enter feedback and select a star rating.');
+      alert('Please enter feedback and select a rating.');
       return;
     }
 
-    if (editMode && editTarget) {
-      // Update mode
-      editTarget.querySelector('.feedback-comment').textContent = comment;
-      editTarget.querySelector('.feedback-rating').innerHTML =
-        '★'.repeat(selectedRating) + '☆'.repeat(5 - selectedRating);
-      resetForm();
-    } else {
-      // Create new feedback item
-      const item = document.createElement('div');
-      item.className = 'list-group-item d-flex justify-content-between align-items-start flex-column flex-md-row gap-2';
+    const formData = new FormData();
+    formData.append('comment', comment);
+    formData.append('rating', selectedRating);
 
-      item.innerHTML = `
-        <div>
-          <p class="mb-1 feedback-comment">${comment}</p>
-          <p class="text-warning mb-1 feedback-rating">${'★'.repeat(selectedRating)}${'☆'.repeat(5 - selectedRating)}</p>
-        </div>
-        <div>
-          <button class="btn btn-sm btn-outline-primary me-2 edit-btn">Edit</button>
-          <button class="btn btn-sm btn-outline-danger delete-btn">Delete</button>
-        </div>
-      `;
-
-      // Add event listeners to edit and delete buttons
-      item.querySelector('.edit-btn').addEventListener('click', () => {
-        commentInput.value = item.querySelector('.feedback-comment').textContent;
-        selectedRating = item.querySelector('.feedback-rating').textContent.split('★').length - 1;
-        updateStars(selectedRating);
-        editMode = true;
-        editTarget = item;
-      });
-
-      item.querySelector('.delete-btn').addEventListener('click', () => {
-        if (confirm('Are you sure you want to delete this feedback?')) {
-          item.remove();
-          if (item === editTarget) resetForm();
-        }
-      });
-
-      feedbackList.prepend(item);
-      resetForm();
-    }
+    fetch('feedback_handler.php?action=create', {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(response => {
+      if (response.success) {
+        form.reset();
+        selectedRating = 0;
+        updateStars(0);
+        loadFeedback();
+      } else {
+        alert('Error submitting feedback.');
+      }
+    });
   });
-
-  function resetForm() {
-    commentInput.value = '';
-    selectedRating = 0;
-    updateStars(0);
-    editMode = false;
-    editTarget = null;
-  }
 });

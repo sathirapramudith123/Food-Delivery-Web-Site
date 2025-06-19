@@ -1,39 +1,61 @@
 <?php
-include 'database.php'; // Include database connection"
+// Connect to database
+include 'database.php'; // Adjust path if needed
 
-// Handle form submission (Add Food)
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $_POST['foodName'] ?? '';
-    $desc = $_POST['foodDesc'] ?? '';
-    $price = $_POST['foodPrice'] ?? 0;
-    $image = $_POST['foodImage'] ?? '';
+// Handle create/update submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id = $_POST['id'] ?? null;
+    $comment = trim($_POST['comment'] ?? '');
+    $rating = (int)($_POST['rating'] ?? 0);
 
-    // Basic validation
-    if ($name && $desc && $price > 0) {
-        $stmt = $conn->prepare("INSERT INTO food_menu (name, description, price, image) VALUES (?, ?, ?, ?)");
-        $stmt->bind_param("ssds", $name, $desc, $price, $image);
-        $stmt->execute();
-        $stmt->close();
-        header("Location: food_menu.php"); // redirect to clear POST data
+    if ($comment !== '' && $rating >= 1 && $rating <= 5) {
+        if ($id) {
+            // Update existing feedback
+            $stmt = $conn->prepare("UPDATE feedback SET comment=?, rating=? WHERE id=?");
+            $stmt->bind_param("sii", $comment, $rating, $id);
+            $stmt->execute();
+            $stmt->close();
+        } else {
+            // Insert new feedback
+            $stmt = $conn->prepare("INSERT INTO feedback (comment, rating) VALUES (?, ?)");
+            $stmt->bind_param("si", $comment, $rating);
+            $stmt->execute();
+            $stmt->close();
+        }
+        header("Location: " . $_SERVER['PHP_SELF']);
         exit;
-    } else {
-        $error = "Please fill all required fields correctly.";
     }
 }
 
-// Fetch food items from DB
-$search = $_GET['search'] ?? '';
-if ($search) {
-    $stmt = $conn->prepare("SELECT * FROM food_menu WHERE name LIKE ?");
-    $likeSearch = "%$search%";
-    $stmt->bind_param("s", $likeSearch);
-} else {
-    $stmt = $conn->prepare("SELECT * FROM food_menu");
+// Handle delete
+if (isset($_GET['delete'])) {
+    $id = (int)$_GET['delete'];
+    $stmt = $conn->prepare("DELETE FROM feedback WHERE id=?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->close();
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
 }
-$stmt->execute();
-$result = $stmt->get_result();
-$menuItems = $result->fetch_all(MYSQLI_ASSOC);
-$stmt->close();
+
+// Handle edit (load data for form)
+$editItem = null;
+if (isset($_GET['edit'])) {
+    $id = (int)$_GET['edit'];
+    $stmt = $conn->prepare("SELECT * FROM feedback WHERE id=?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $editItem = $result->fetch_assoc();
+    $stmt->close();
+}
+
+// Fetch all feedback to display
+$feedbacks = [];
+$result = $conn->query("SELECT * FROM feedback ORDER BY created_at DESC");
+if ($result) {
+    $feedbacks = $result->fetch_all(MYSQLI_ASSOC);
+}
 ?>
 
 <!DOCTYPE html>
@@ -41,74 +63,94 @@ $stmt->close();
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Food Menu - FoodExpress</title>
+  <title>Feedback - FoodExpress</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="../style/food menu.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="../style/feedback.css" />
+  <style>
+    .star-rating .fa-star { cursor: pointer; }
+    .star-rating .fa-star.checked { color: gold; }
+  </style>
 </head>
 <body>
 
-  <?php include ("../index/navbar.php"); ?>
+  <?php include("../index/navbar.php"); ?>
 
-  <section class="menu-section py-5">
+  <section class="feedback-section py-5">
     <div class="container">
-      <h2 class="text-danger text-center mb-4">Manage Food Menu</h2>
+      <h2 class="text-danger text-center mb-4">Customer Feedback</h2>
 
-      <!-- Search Box -->
-      <form method="GET" class="mb-3">
-        <input type="text" name="search" class="form-control" placeholder="Search food by name..." value="<?= htmlspecialchars($search) ?>" />
-      </form>
-
-      <!-- Error message -->
-      <?php if (!empty($error)): ?>
-        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-      <?php endif; ?>
-
-      <!-- Add Form -->
-      <form id="foodForm" class="row g-3 mb-4" method="POST" action="food_menu.php">
-        <div class="col-md-3">
-          <input type="text" name="foodName" class="form-control" placeholder="Food Name" required />
+      <!-- Feedback Form -->
+      <form method="POST" class="row g-3 mb-4" id="feedbackForm">
+        <input type="hidden" name="id" value="<?= htmlspecialchars($editItem['id'] ?? '') ?>">
+        <div class="col-md-6">
+          <input type="text" name="comment" class="form-control" placeholder="Your Feedback" required
+                 value="<?= htmlspecialchars($editItem['comment'] ?? '') ?>" />
         </div>
-        <div class="col-md-3">
-          <input type="text" name="foodDesc" class="form-control" placeholder="Description" required />
+        <div class="col-md-4 star-rating d-flex align-items-center" id="starRating">
+          <?php
+          $currentRating = $editItem['rating'] ?? 0;
+          for ($i = 1; $i <= 5; $i++) {
+              $class = ($i <= $currentRating) ? 'fa-star checked' : 'fa-star';
+              echo "<span class='fa fa-star $class' data-rating='$i'></span>";
+          }
+          ?>
+          <input type="hidden" name="rating" id="ratingInput" value="<?= $currentRating ?>" required />
         </div>
         <div class="col-md-2">
-          <input type="number" name="foodPrice" class="form-control" placeholder="Price ($)" step="0.01" required />
-        </div>
-        <div class="col-md-2">
-          <input type="url" name="foodImage" class="form-control" placeholder="Image URL" />
-        </div>
-        <div class="col-md-2">
-          <button type="submit" class="btn btn-danger w-100" id="submitBtn">Add Food</button>
+          <button type="submit" class="btn btn-danger w-100"><?= isset($editItem) ? 'Update' : 'Submit' ?></button>
+          <?php if (isset($editItem)): ?>
+            <a href="<?= $_SERVER['PHP_SELF'] ?>" class="btn btn-secondary w-100 mt-2">Cancel</a>
+          <?php endif; ?>
         </div>
       </form>
 
-      <!-- Menu List -->
-      <div id="menuList" class="row row-cols-1 row-cols-md-2 g-3">
-        <?php foreach ($menuItems as $food): ?>
-          <div class="col">
-            <div class="card">
-              <?php if ($food['image']): ?>
-                <img src="<?= htmlspecialchars($food['image']) ?>" class="card-img-top" alt="<?= htmlspecialchars($food['name']) ?>" />
-              <?php endif; ?>
-              <div class="card-body">
-                <h5 class="card-title"><?= htmlspecialchars($food['name']) ?></h5>
-                <p class="card-text"><?= htmlspecialchars($food['description']) ?></p>
-                <p class="card-text"><strong>$<?= number_format($food['price'], 2) ?></strong></p>
+      <!-- Feedback List -->
+      <div class="list-group">
+        <?php if (empty($feedbacks)): ?>
+          <p class="text-center">No feedback found.</p>
+        <?php else: ?>
+          <?php foreach ($feedbacks as $fb): ?>
+            <div class="list-group-item">
+              <p><?= htmlspecialchars($fb['comment']) ?></p>
+              <p>
+                <?php for ($i = 1; $i <= 5; $i++): ?>
+                  <span class="fa fa-star <?= $i <= $fb['rating'] ? 'checked' : '' ?>"></span>
+                <?php endfor; ?>
+              </p>
+              <small class="text-muted">Posted on <?= $fb['created_at'] ?></small>
+              <div class="mt-2">
+                <a href="?edit=<?= $fb['id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
+                <a href="?delete=<?= $fb['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this feedback?')">Delete</a>
               </div>
             </div>
-          </div>
-        <?php endforeach; ?>
-        <?php if (count($menuItems) === 0): ?>
-          <p class="text-center">No food items found.</p>
+          <?php endforeach; ?>
         <?php endif; ?>
       </div>
     </div>
   </section>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Star rating click handler
+    const stars = document.querySelectorAll('#starRating .fa-star');
+    const ratingInput = document.getElementById('ratingInput');
+    stars.forEach(star => {
+      star.addEventListener('click', () => {
+        const rating = star.getAttribute('data-rating');
+        ratingInput.value = rating;
+        stars.forEach(s => s.classList.remove('checked'));
+        for(let i=0; i<rating; i++) {
+          stars[i].classList.add('checked');
+        }
+      });
+    });
+  </script>
 
-  <?php include ("../index/footer.php"); ?>
+  <?php include("../index/footer.php"); ?>
 </body>
 </html>
 
-<?php $conn->close(); ?>
+<?php
+$conn->close();
+?>
