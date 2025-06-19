@@ -13,10 +13,10 @@
       <div class="col-md-4 mb-4">
         <h5 class="text-uppercase">Quick Links</h5>
         <ul class="list-unstyled">
-          <li><a href="home.html" class="text-white text-decoration-none">Home</a></li>
-          <li><a href="about.html" class="text-white text-decoration-none">About</a></li>
-          <li><a href="contact.html" class="text-white text-decoration-none">Contact</a></li>
-          <li><a href="privacy.html" class="text-white text-decoration-none">Privacy Policy</a></li>
+          <li><a href="home.php" class="text-white text-decoration-none">Home</a></li>
+          <li><a href="about.php" class="text-white text-decoration-none">About</a></li>
+          <li><a href="contact.php" class="text-white text-decoration-none">Contact</a></li>
+          <li><a href="privacy.php" class="text-white text-decoration-none">Privacy Policy</a></li>
         </ul>
       </div>
 

@@ -1,3 +1,9 @@
+<?php
+// Optional: Start a session if you plan to manage user login
+session_start();
+?>
+
+<?php include ("../index/navbar.php"); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,31 +15,14 @@
 </head>
 <body>
 
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-      <a class="navbar-brand" href="home.html">FoodExpress</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link active" href="home.html">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="food menu.html">Menu</a></li>
-          <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
-          <li class="nav-item"><a class="nav-link" href="register.html">Register</a></li>
-          <li class="nav-item"><a class="nav-link" href="about.html">About Us</a></li>
-        </ul>
-      </div>
-    </div>
-  </nav>
+
 
   <!-- Hero Section -->
   <header class="hero-section text-white d-flex align-items-center">
     <div class="container text-center">
       <h1 class="display-4 fw-bold">Delicious Food Delivered Fast</h1>
       <p class="lead">Order your favorite meals anytime, anywhere!</p>
-      <a href="food menu.html" class="btn btn-danger btn-lg mt-3">Browse Menu</a>
+      <a href="food_menu.php" class="btn btn-danger btn-lg mt-3">Browse Menu</a>
     </div>
   </header>
 
@@ -64,9 +53,8 @@
     </div>
   </section>
 
-  
-
-
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <?php include ("../index/footer.php"); ?>
 </body>
 </html>
