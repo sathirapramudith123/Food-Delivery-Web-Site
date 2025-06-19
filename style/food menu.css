@@ -2,11 +2,16 @@
   background-color: #f8f9fa;
 }
 
-.card-title {
+.card {
+  position: relative;
+  background-color: #fff;
+}
+
+.card-body h5 {
   color: #dc3545;
 }
 
-.card-img-top {
-  height: 200px;
+.card img {
+  height: 180px;
   object-fit: cover;
 }
