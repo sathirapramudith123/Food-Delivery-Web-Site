@@ -85,7 +85,7 @@ $menuItems = $result->fetch_all(MYSQLI_ASSOC);
 
 <section class="menu-section py-5">
   <div class="container">
-    <h2 class="text-danger text-center mb-4">Manage Food Menu</h2>
+    <h2 class="text-danger text-center mb-4"> Food Menu</h2>
 
     <!-- Error -->
     <?php if ($error): ?>
