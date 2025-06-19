@@ -1,8 +1,8 @@
 <?php 
-// Optional: Start a session if you plan to manage user login
+// Start session if needed
 session_start();
 
-require_once 'database.php'; // Adjust path if needed
+require_once 'database.php'; // adjust path as needed
 
 // Fetch featured food items (latest 3)
 $featuredItems = [];
@@ -10,9 +10,17 @@ $result = $conn->query("SELECT * FROM food_menu ORDER BY id DESC LIMIT 3");
 if ($result && $result->num_rows > 0) {
     $featuredItems = $result->fetch_all(MYSQLI_ASSOC);
 }
+
+// Fetch latest 3 customer feedbacks
+$feedbacks = [];
+$feedbackResult = $conn->query("SELECT * FROM feedback ORDER BY created_at DESC LIMIT 3");
+if ($feedbackResult && $feedbackResult->num_rows > 0) {
+    $feedbacks = $feedbackResult->fetch_all(MYSQLI_ASSOC);
+}
 ?>
 
 <?php include ("../index/navbar.php"); ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,15 +29,21 @@ if ($result && $result->num_rows > 0) {
   <title>FoodExpress - Home</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="../style/home.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    .fa-star.checked {
+      color: gold;
+    }
+  </style>
 </head>
 <body>
 
   <!-- Hero Section -->
-  <header class="hero-section text-white d-flex align-items-center">
+  <header class="hero-section text-white d-flex align-items-center" >
     <div class="container text-center">
       <h1 class="display-4 fw-bold">Delicious Food Delivered Fast</h1>
       <p class="lead">Order your favorite meals anytime, anywhere!</p>
-      <a href="foodmenu.php" class="btn btn-danger btn-lg mt-3">Browse Menu</a>
+      <a href="foodmenu.php" class="btn btn-light btn-lg mt-3" style="border-radius: 20px; color: #dc3545;">Browse Menu</a>
     </div>
   </header>
 
@@ -86,6 +100,35 @@ if ($result && $result->num_rows > 0) {
       </div>
       <div class="text-center mt-4">
         <a href="foodmenu.php" class="btn btn-outline-danger">View Full Menu</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Customer Feedback Section -->
+  <section class="py-5 bg-light">
+    <div class="container">
+      <h2 class="text-danger text-center mb-4">What Our Customers Say</h2>
+      <div class="row g-4">
+        <?php if (!empty($feedbacks)): ?>
+          <?php foreach ($feedbacks as $fb): ?>
+            <div class="col-md-4">
+              <div class="p-4 bg-white shadow-sm rounded h-100">
+                <p class="mb-2"><?= htmlspecialchars($fb['comment']) ?></p>
+                <div>
+                  <?php for ($i = 1; $i <= 5; $i++): ?>
+                    <span class="fa fa-star <?= $i <= $fb['rating'] ? 'checked' : 'text-muted' ?>"></span>
+                  <?php endfor; ?>
+                </div>
+                <small class="text-muted">Posted on <?= date('F j, Y', strtotime($fb['created_at'])) ?></small>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <p class="text-center">No customer feedback yet.</p>
+        <?php endif; ?>
+      </div>
+      <div class="text-center mt-4">
+        <a href="feedback.php" class="btn btn-outline-danger">Leave Feedback</a>
       </div>
     </div>
   </section>
