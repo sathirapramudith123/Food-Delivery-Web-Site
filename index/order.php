@@ -9,13 +9,7 @@
 </head>
 <body>
 
-  <!-- Navbar -->
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <a class="navbar-brand" href="home.html">FoodExpress</a>
-    </div>
-  </nav>
-
+  <?php include ("../index/navbar.php"); ?>
   <!-- Order Management Section -->
   <section class="py-5 order-section">
     <div class="container">
@@ -63,11 +57,11 @@
     </div>
   </section>
 
-  <footer class="bg-dark text-white text-center py-3">
-    <p class="mb-0">&copy; 2025 FoodExpress</p>
-  </footer>
+  
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../js/order.js"></script>
+
+  <?php include ("../index/footer.php"); ?>
 </body>
 </html>

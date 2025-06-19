@@ -9,12 +9,7 @@
 </head>
 <body>
 
-  <!-- Navbar -->
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <a class="navbar-brand" href="home.html">FoodExpress</a>
-    </div>
-  </nav>
+<?php include ("../index/navbar.php"); ?>
 
   <!-- Cart Section -->
   <section class="py-5 cart-section">
@@ -23,12 +18,7 @@
 
       <!-- Add Item Form -->
       <form id="addForm" class="row g-3 mb-4">
-        <div class="col-md-4">
-          <input type="text" id="itemName" class="form-control" placeholder="Item Name" required />
-        </div>
-        <div class="col-md-3">
-          <input type="number" id="itemPrice" class="form-control" placeholder="Price" step="0.01" required />
-        </div>
+
         <div class="col-md-3">
           <input type="number" id="itemQuantity" class="form-control" placeholder="Quantity" min="1" required />
         </div>
@@ -49,5 +39,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../js/cart.js"></script>
+
+<?php include ("../index/footer.php"); ?>
 </body>
 </html>

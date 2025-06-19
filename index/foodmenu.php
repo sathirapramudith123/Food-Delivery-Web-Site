@@ -134,6 +134,10 @@ $menuItems = $result->fetch_all(MYSQLI_ASSOC);
                   <a href="?edit=<?= $food['id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
                   <a href="?delete=<?= $food['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this item?')">Delete</a>
                 </div>
+                <form method="POST" class="mt-2">
+                  <input type="hidden" name="foodId" value="<?= $food['id'] ?>">
+                  <button type="submit" formaction="cart.php" class="btn btn-sm btn-outline-success">Add to Cart</button>
+                </form>
               </div>
             </div>
           </div>
