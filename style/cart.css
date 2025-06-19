@@ -1,0 +1,14 @@
+.cart-section {
+  background-color: #f8f9fa;
+}
+
+.cart-item {
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 1rem;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.cart-item h5 {
+  margin-bottom: 0.5rem;
+}
