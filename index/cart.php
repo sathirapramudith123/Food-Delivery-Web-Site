@@ -113,6 +113,11 @@ $cartTotal = array_sum(array_column($cartItems, 'total'));
     <div class="text-end">
       <h5>Total: <span class="text-success">$<?= number_format($cartTotal, 2) ?></span></h5>
     </div>
+    <form method="POST" class="mt-2">
+      <input type="hidden" name="foodId" value="<?= $food['id'] ?>">
+      <input type="hidden" name="quantity" value="1">
+      <button type="submit" formaction="order.php" class="btn btn-sm btn-outline-success">Add Order</button>
+    </form>
   <?php endif; ?>
 </div>
 

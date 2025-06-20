@@ -17,6 +17,7 @@
           <li><a href="about.php" class="text-white text-decoration-none">About</a></li>
           <li><a href="contact.php" class="text-white text-decoration-none">Contact</a></li>
           <li><a href="privacy.php" class="text-white text-decoration-none">Privacy Policy</a></li>
+          <li><a href="feedback.php" class="text-white text-decoration-none">Feedback</a></li>
         </ul>
       </div>
 
