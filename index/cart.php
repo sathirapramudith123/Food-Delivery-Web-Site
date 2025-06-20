@@ -53,13 +53,22 @@ if (isset($_GET['delete'])) {
     exit;
 }
 
-// Fetch cart items
-$cartItems = $conn->query("
-    SELECT c.id, c.food_id, c.quantity, c.total, f.name
+// Search logic
+$searchTerm = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
+
+$cartItemsQuery = "
+    SELECT c.id, c.food_id, c.quantity, c.total, f.name, f.price
     FROM cart c
     JOIN food_menu f ON c.food_id = f.id
-    ORDER BY c.id DESC
-")->fetch_all(MYSQLI_ASSOC);
+";
+
+if ($searchTerm !== '') {
+    $cartItemsQuery .= " WHERE f.name LIKE '%$searchTerm%'";
+}
+
+$cartItemsQuery .= " ORDER BY c.id DESC";
+
+$cartItems = $conn->query($cartItemsQuery)->fetch_all(MYSQLI_ASSOC);
 
 $cartTotal = array_sum(array_column($cartItems, 'total'));
 ?>
@@ -79,8 +88,14 @@ $cartTotal = array_sum(array_column($cartItems, 'total'));
 <div class="container py-5">
   <h2 class="text-danger text-center mb-4">Your Cart</h2>
 
+  <!-- Search Form -->
+  <form method="GET" class="mb-4 d-flex justify-content-center">
+    <input type="text" name="search" class="form-control w-25 me-2" placeholder="Search food name..." value="<?= htmlspecialchars($searchTerm) ?>">
+    <button type="submit" class="btn btn-primary">Search</button>
+  </form>
+
   <?php if (empty($cartItems)): ?>
-    <p class="text-center">Your cart is empty.</p>
+    <p class="text-center">Your cart is empty<?= $searchTerm ? " for '<strong>" . htmlspecialchars($searchTerm) . "</strong>'" : "" ?>.</p>
   <?php else: ?>
     <table class="table table-bordered align-middle">
       <thead>
@@ -110,12 +125,10 @@ $cartTotal = array_sum(array_column($cartItems, 'total'));
         <?php endforeach; ?>
       </tbody>
     </table>
-    <div class="text-end">
-      <h5>Total: <span class="text-success">$<?= number_format($cartTotal, 2) ?></span></h5>
-    </div>
+
+    <!-- Dummy Add Order button for completeness -->
     <form method="POST" class="mt-2">
-      <input type="hidden" name="foodId" value="<?= $food['id'] ?>">
-      <input type="hidden" name="quantity" value="1">
+      <!-- You can customize how you process order submission -->
       <button type="submit" formaction="order.php" class="btn btn-sm btn-outline-success">Add Order</button>
     </form>
   <?php endif; ?>
