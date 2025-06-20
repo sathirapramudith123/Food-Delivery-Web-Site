@@ -136,6 +136,7 @@ $menuItems = $result->fetch_all(MYSQLI_ASSOC);
                 </div>
                 <form method="POST" class="mt-2">
                   <input type="hidden" name="foodId" value="<?= $food['id'] ?>">
+                  <input type="hidden" name="quantity" value="6">
                   <button type="submit" formaction="cart.php" class="btn btn-sm btn-outline-success">Add to Cart</button>
                 </form>
               </div>
