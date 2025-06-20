@@ -7,9 +7,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $name = trim($_POST['regName']);
   $email = trim($_POST['regEmail']);
   $password = trim($_POST['regPassword']);
+  $phone = trim($_POST['regPhone']); // New line
 
-  if (!empty($name) && !empty($email) && !empty($password)) {
-    // Hash the password
+  if (!empty($name) && !empty($email) && !empty($password) && !empty($phone)) {
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     // Check if email already exists
@@ -21,9 +21,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($checkStmt->num_rows > 0) {
       $message = "<div class='alert alert-warning'>Email is already registered.</div>";
     } else {
-      // Insert new user
-      $stmt = $conn->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
-      $stmt->bind_param("sss", $name, $email, $hashedPassword);
+      // Insert new user with phone
+      $stmt = $conn->prepare("INSERT INTO users (name, email, password, phone) VALUES (?, ?, ?, ?)");
+      $stmt->bind_param("ssss", $name, $email, $hashedPassword, $phone);
 
       if ($stmt->execute()) {
         $message = "<div class='alert alert-success'>Registration successful!</div>";
@@ -76,6 +76,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="mb-3">
               <label for="regEmail" class="form-label">Email</label>
               <input type="email" class="form-control" id="regEmail" name="regEmail" required>
+            </div>
+            <div class="mb-3">
+              <label for="regPhone" class="form-label">Phone Number</label>
+              <input type="text" class="form-control" id="regPhone" name="regPhone" required>
             </div>
             <div class="mb-3">
               <label for="regPassword" class="form-label">Password</label>
