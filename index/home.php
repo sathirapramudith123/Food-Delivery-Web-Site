@@ -27,6 +27,7 @@ if ($feedbackResult && $feedbackResult->num_rows > 0) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>FoodExpress - Home</title>
+  <link rel="icon" type="image/png" href="../images/favicon.png" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="../style/home.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -42,7 +43,7 @@ if ($feedbackResult && $feedbackResult->num_rows > 0) {
   <header class="hero-section text-white d-flex align-items-center" >
     <div class="container text-center">
       <h1 class="display-4 fw-bold">Delicious Food Delivered Fast</h1>
-      <p class="lead">Order your favorite meals anytime, anywhere!</p>
+      <p class="lead" style="color: ghostwhite;">Order your favorite meals anytime, anywhere!</p>
       <a href="foodmenu.php" class="btn btn-light btn-lg mt-3" style="border-radius: 20px; color: #dc3545;">Browse Menu</a>
     </div>
   </header>

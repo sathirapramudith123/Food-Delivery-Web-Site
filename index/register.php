@@ -1,18 +1,17 @@
 <?php
-include 'database.php'; // Include DB connection at the top
-
+include 'database.php';
 $message = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $name = trim($_POST['regName']);
   $email = trim($_POST['regEmail']);
   $password = trim($_POST['regPassword']);
-  $phone = trim($_POST['regPhone']); // New line
+  $phone = trim($_POST['regPhone']);
+  $role = $_POST['regRole'];
 
-  if (!empty($name) && !empty($email) && !empty($password) && !empty($phone)) {
+  if (!empty($name) && !empty($email) && !empty($password) && !empty($phone) && !empty($role)) {
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    // Check if email already exists
     $checkStmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
     $checkStmt->bind_param("s", $email);
     $checkStmt->execute();
@@ -21,9 +20,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($checkStmt->num_rows > 0) {
       $message = "<div class='alert alert-warning'>Email is already registered.</div>";
     } else {
-      // Insert new user with phone
-      $stmt = $conn->prepare("INSERT INTO users (name, email, password, phone) VALUES (?, ?, ?, ?)");
-      $stmt->bind_param("ssss", $name, $email, $hashedPassword, $phone);
+      $stmt = $conn->prepare("INSERT INTO users (name, email, password, phone, role) VALUES (?, ?, ?, ?, ?)");
+      $stmt->bind_param("sssss", $name, $email, $hashedPassword, $phone, $role);
 
       if ($stmt->execute()) {
         $message = "<div class='alert alert-success'>Registration successful!</div>";
@@ -47,52 +45,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Register - FoodExpress</title>
+  <title>Register</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="../style/register.css">
 </head>
 <body>
-
-  <!-- Navbar -->
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-      <a class="navbar-brand" href="home.php">FoodExpress</a>
-    </div>
-  </nav>
-
-  <!-- Register Form -->
-  <section class="form-section py-5">
-    <div class="container">
-      <h2 class="text-center text-danger mb-4">Create an Account Here</h2>
-      <div class="row justify-content-center">
-        <div class="col-md-6">
-          <?php if (!empty($message)) echo $message; ?>
-          <form id="registerForm" method="POST" action="register.php">
-            <div class="mb-3">
-              <label for="regName" class="form-label">Full Name</label>
-              <input type="text" class="form-control" id="regName" name="regName" required>
-            </div>
-            <div class="mb-3">
-              <label for="regEmail" class="form-label">Email</label>
-              <input type="email" class="form-control" id="regEmail" name="regEmail" required>
-            </div>
-            <div class="mb-3">
-              <label for="regPhone" class="form-label">Phone Number</label>
-              <input type="text" class="form-control" id="regPhone" name="regPhone" required>
-            </div>
-            <div class="mb-3">
-              <label for="regPassword" class="form-label">Password</label>
-              <input type="password" class="form-control" id="regPassword" name="regPassword" required>
-            </div>
-            <button type="submit" class="btn btn-danger w-100">Register</button>
-            <p class="text-center mt-3">Already have an account? <a href="login.php">Login here</a></p>
-          </form>
-        </div>
+<?php include 'navbar.php'; ?>
+  <div class="container py-5">
+    <h2 class="text-center mb-4">Register</h2>
+    <?php if (!empty($message)) echo $message; ?>
+    <form method="POST" action="register.php">
+      <div class="mb-3">
+        <label>Full Name</label>
+        <input type="text" name="regName" class="form-control" required>
       </div>
-    </div>
-  </section>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      <div class="mb-3">
+        <label>Email</label>
+        <input type="email" name="regEmail" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label>Phone Number</label>
+        <input type="text" name="regPhone" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label>Password</label>
+        <input type="password" name="regPassword" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label>Role</label>
+        <select name="regRole" class="form-control" required>
+          <option value="user">User</option>
+          <option value="delivery">Delivery Member</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-danger w-100">Register</button>
+      <p class="text-center mt-3">Already have an account? <a href="login.php">Login</a></p>
+    </form>
+  </div>
+<?php include 'footer.php'; ?>
 </body>
 </html>
