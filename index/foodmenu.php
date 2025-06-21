@@ -8,8 +8,8 @@ $uploadDir = 'uploads/';
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
     $result = $conn->query("SELECT image FROM food_menu WHERE id=$id");
-    if ($row = $result->fetch_assoc()) {
-        if (file_exists($row['image'])) unlink($row['image']);
+    if ($result && $row = $result->fetch_assoc()) {
+        if (!empty($row['image']) && file_exists($row['image'])) unlink($row['image']);
     }
     $conn->query("DELETE FROM food_menu WHERE id=$id");
     header("Location: " . $_SERVER['PHP_SELF']);
@@ -61,11 +61,16 @@ $editItem = null;
 if (isset($_GET['edit'])) {
     $id = (int)$_GET['edit'];
     $res = $conn->query("SELECT * FROM food_menu WHERE id=$id");
-    $editItem = $res->fetch_assoc();
+    if ($res) {
+        $editItem = $res->fetch_assoc();
+    }
 }
 
 $result = $conn->query("SELECT * FROM food_menu ORDER BY id DESC");
-$menuItems = $result->fetch_all(MYSQLI_ASSOC);
+$menuItems = [];
+if ($result) {
+    $menuItems = $result->fetch_all(MYSQLI_ASSOC);
+}
 ?>
 
 <!DOCTYPE html>
@@ -130,14 +135,15 @@ $menuItems = $result->fetch_all(MYSQLI_ASSOC);
                 <h5 class="card-title"><?= htmlspecialchars($food['name']) ?></h5>
                 <p class="card-text"><?= htmlspecialchars($food['description']) ?></p>
                 <p class="card-text fw-bold">$<?= number_format($food['price'], 2) ?></p>
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-2 flex-wrap">
                   <a href="?edit=<?= $food['id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
                   <a href="?delete=<?= $food['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this item?')">Delete</a>
                 </div>
-                <form method="POST" class="mt-2">
-                  <input type="hidden" name="order_food_id" value="<?= $food['id'] ?>">
-                  <button type="submit" formaction="cart.php" class="btn btn-sm btn-outline-success">Add to Cart</button>
-                </form>
+                  <form method="POST" class="mt-2">
+                      <input type="hidden" name="cart_food_id" value="<?= $food['id'] ?>">
+                      <input type="hidden" name="cart_quantity" value="1">
+                      <button type="submit" formaction="cart.php" class="btn btn-sm btn-outline-success ">Add to Cart</button>
+                  </form>
               </div>
             </div>
           </div>
