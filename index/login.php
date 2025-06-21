@@ -24,13 +24,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
       switch ($role) {
         case 'user':
-          header("Location: profile.php");
+          header("Location: home.php"); //navigate to user home page
           break;
         case 'delivery':
-          header("Location: deliveryprofile.php");
+          header("Location: order.php"); //navigate to delivery dashboard
           break;
         case 'admin':
-          header("Location: adminprofile.php");
+          header("Location: admindashboard.php"); //naviagte to admin dashboard
           break;
       }
       exit();

@@ -5,12 +5,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
   exit();
 }
 
-include 'database.php'; // Ensure it connects $conn
+include 'database.php'; // Assumes $conn is defined here
 
 $message = '';
 $editUser = null;
 
-// Create / Update
+// Handle Create / Update
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save'])) {
   $id = $_POST['id'] ?? '';
   $name = trim($_POST['name']);
@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save'])) {
   $password = !empty($_POST['password']) ? password_hash($_POST['password'], PASSWORD_DEFAULT) : null;
 
   if ($id) {
-    // Update
+    // Update user
     $sql = "UPDATE users SET name=?, email=?, phone=?, role=?";
     $types = "ssss";
     $params = [$name, $email, $phone, $role];
@@ -37,11 +37,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save'])) {
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param($types, ...$params);
-
     $message = $stmt->execute() ? "User updated successfully!" : "Update failed!";
     $stmt->close();
   } else {
-    // Create
+    // Create new user
     $stmt = $conn->prepare("INSERT INTO users (name, email, password, phone, role) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("sssss", $name, $email, $password, $phone, $role);
     $message = $stmt->execute() ? "User created successfully!" : "Creation failed!";
@@ -49,24 +48,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save'])) {
   }
 }
 
-// Edit
+// Handle Edit
 if (isset($_GET['edit'])) {
-  $id = $_GET['edit'];
+  $id = intval($_GET['edit']);
   $result = $conn->query("SELECT * FROM users WHERE id = $id");
   $editUser = $result->fetch_assoc();
 }
 
-// Delete
+// Handle Delete
 if (isset($_GET['delete'])) {
-  $id = $_GET['delete'];
-  if ($id != $_SESSION['user_id']) { // Prevent deleting self
+  $id = intval($_GET['delete']);
+  if ($id != $_SESSION['user_id']) {
     $conn->query("DELETE FROM users WHERE id = $id");
   }
   header("Location: admin_profile.php");
   exit();
 }
 
-// Fetch all users
+// Fetch All Users
 $users = $conn->query("SELECT * FROM users ORDER BY id DESC");
 ?>
 
@@ -78,33 +77,40 @@ $users = $conn->query("SELECT * FROM users ORDER BY id DESC");
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
+
 <?php include 'navbar.php'; ?>
+
 <div class="container py-4">
   <h2 class="mb-4 text-primary">Admin Dashboard - Welcome <?= htmlspecialchars($_SESSION['user_name']) ?></h2>
 
   <?php if ($message): ?>
-    <div class="alert alert-info"><?= $message ?></div>
+    <div class="alert alert-info"><?= htmlspecialchars($message) ?></div>
   <?php endif; ?>
 
   <!-- User Form -->
   <form method="POST" class="card p-4 mb-4">
     <input type="hidden" name="id" value="<?= $editUser['id'] ?? '' ?>">
+    
     <div class="mb-3">
       <label>Name</label>
-      <input type="text" name="name" class="form-control" value="<?= $editUser['name'] ?? '' ?>" required>
+      <input type="text" name="name" class="form-control" value="<?= htmlspecialchars($editUser['name'] ?? '') ?>" required>
     </div>
+
     <div class="mb-3">
       <label>Email</label>
-      <input type="email" name="email" class="form-control" value="<?= $editUser['email'] ?? '' ?>" required>
+      <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($editUser['email'] ?? '') ?>" required>
     </div>
+
     <div class="mb-3">
       <label>Phone</label>
-      <input type="text" name="phone" class="form-control" value="<?= $editUser['phone'] ?? '' ?>" required>
+      <input type="text" name="phone" class="form-control" value="<?= htmlspecialchars($editUser['phone'] ?? '') ?>" required>
     </div>
+
     <div class="mb-3">
       <label>Password <?= $editUser ? '(leave blank to keep current)' : '' ?></label>
       <input type="password" name="password" class="form-control">
     </div>
+
     <div class="mb-3">
       <label>Role</label>
       <select name="role" class="form-control" required>
@@ -113,6 +119,7 @@ $users = $conn->query("SELECT * FROM users ORDER BY id DESC");
         <option value="admin" <?= (isset($editUser['role']) && $editUser['role'] === 'admin') ? 'selected' : '' ?>>Admin</option>
       </select>
     </div>
+
     <button type="submit" name="save" class="btn btn-success">Save User</button>
     <a href="logout.php" class="btn btn-danger float-end">Logout</a>
   </form>
@@ -144,6 +151,7 @@ $users = $conn->query("SELECT * FROM users ORDER BY id DESC");
     </tbody>
   </table>
 </div>
+
 <?php include 'footer.php'; ?>
 </body>
 </html>
