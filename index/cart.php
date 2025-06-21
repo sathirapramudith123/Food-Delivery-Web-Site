@@ -1,7 +1,12 @@
 <?php
+session_start();
 include 'database.php';
 
 $msg = '';
+
+// Simulated login for demo purposes — replace with actual user session logic
+$userId = $_SESSION['user_id'] ?? 1;
+$userName = $_SESSION['user_name'] ?? 'Guest';
 
 // Handle Add to Cart
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cart_food_id'])) {
@@ -17,9 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cart_food_id'])) {
         $name = $food['name'];
         $price = $food['price'];
 
-        // Check if already in cart
-        $check = $conn->prepare("SELECT id, quantity FROM cart WHERE food_id = ?");
-        $check->bind_param("i", $foodId);
+        $check = $conn->prepare("SELECT id, quantity FROM cart WHERE food_id = ? AND user_id = ?");
+        $check->bind_param("ii", $foodId, $userId);
         $check->execute();
         $checkRes = $check->get_result();
 
@@ -29,8 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cart_food_id'])) {
             $upd->bind_param("ii", $newQty, $row['id']);
             $upd->execute();
         } else {
-            $ins = $conn->prepare("INSERT INTO cart (food_id, food_name, price, quantity) VALUES (?, ?, ?, ?)");
-            $ins->bind_param("isdi", $foodId, $name, $price, $quantity);
+            $ins = $conn->prepare("INSERT INTO cart (user_id, food_id, food_name, price, quantity) VALUES (?, ?, ?, ?, ?)");
+            $ins->bind_param("iisdi", $userId, $foodId, $name, $price, $quantity);
             $ins->execute();
         }
 
@@ -42,8 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cart_food_id'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_cart_id'])) {
     $id = (int)$_POST['update_cart_id'];
     $qty = max(1, (int)$_POST['update_quantity']);
-    $up = $conn->prepare("UPDATE cart SET quantity = ? WHERE id = ?");
-    $up->bind_param("ii", $qty, $id);
+
+    $up = $conn->prepare("UPDATE cart SET quantity = ? WHERE id = ? AND user_id = ?");
+    $up->bind_param("iii", $qty, $id, $userId);
     $up->execute();
     $msg = "Quantity updated.";
 }
@@ -51,26 +56,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_cart_id'])) {
 // Handle Delete
 if (isset($_GET['delete'])) {
     $id = (int)$_GET['delete'];
-    $conn->query("DELETE FROM cart WHERE id = $id");
+    $del = $conn->prepare("DELETE FROM cart WHERE id = ? AND user_id = ?");
+    $del->bind_param("ii", $id, $userId);
+    $del->execute();
     $msg = "Item deleted.";
 }
 
-// Handle Place Order (Clears Cart)
+// Handle Place Order
 if (isset($_POST['place_order'])) {
-    $conn->query("DELETE FROM cart");
+    $cartItems = $conn->prepare("SELECT * FROM cart WHERE user_id = ?");
+    $cartItems->bind_param("i", $userId);
+    $cartItems->execute();
+    $result = $cartItems->get_result();
+
+    while ($item = $result->fetch_assoc()) {
+        $cartId = $item['id'];
+        $foodName = $item['food_name'];
+        $quantity = $item['quantity'];
+        $total = $item['price'] * $quantity;
+
+        $insert = $conn->prepare("INSERT INTO orders (cart_id, user_id, food_name, quantity, total, user_name, status) VALUES (?, ?, ?, ?, ?, ?, 'pending')");
+        $insert->bind_param("iisids", $cartId, $userId, $foodName, $quantity, $total, $userName);
+        $insert->execute();
+    }
+
+    // Clear user's cart only
+    $clear = $conn->prepare("DELETE FROM cart WHERE user_id = ?");
+    $clear->bind_param("i", $userId);
+    $clear->execute();
+
     $msg = "Order placed successfully!";
 }
 
 // Handle Search
 $search = $_GET['search'] ?? '';
 if ($search) {
-    $stmt = $conn->prepare("SELECT * FROM cart WHERE food_name LIKE ?");
+    $stmt = $conn->prepare("SELECT * FROM cart WHERE user_id = ? AND food_name LIKE ?");
     $like = "%" . $search . "%";
-    $stmt->bind_param("s", $like);
+    $stmt->bind_param("is", $userId, $like);
     $stmt->execute();
     $items = $stmt->get_result();
 } else {
-    $items = $conn->query("SELECT * FROM cart");
+    $stmt = $conn->prepare("SELECT * FROM cart WHERE user_id = ?");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $items = $stmt->get_result();
 }
 ?>
 
@@ -94,7 +124,7 @@ if ($search) {
 
   <!-- Search Form -->
   <form method="GET" class="mb-4 d-flex justify-content-center">
-    <input type="text" name="search" class="form-control w-25 me-2" placeholder="Search food name..." value="<?= htmlspecialchars($search ?? '') ?>">
+    <input type="text" name="search" class="form-control w-25 me-2" placeholder="Search food name..." value="<?= htmlspecialchars($search) ?>">
     <button type="submit" class="btn btn-primary">Search</button>
     <a href="cart.php" class="btn btn-secondary ms-2">Reset</a>
   </form>
@@ -112,7 +142,12 @@ if ($search) {
         </tr>
       </thead>
       <tbody>
-        <?php while ($item = $items->fetch_assoc()): ?>
+        <?php 
+          $grandTotal = 0;
+          while ($item = $items->fetch_assoc()): 
+            $itemTotal = $item['price'] * $item['quantity'];
+            $grandTotal += $itemTotal;
+        ?>
           <tr>
             <td><?= htmlspecialchars($item['food_name']) ?></td>
             <td>
@@ -122,19 +157,24 @@ if ($search) {
                 <button type="submit" class="btn btn-sm btn-primary">Update</button>
               </form>
             </td>
-            <td>$<?= number_format($item['price'] * $item['quantity'], 2) ?></td>
+            <td>$<?= number_format($itemTotal, 2) ?></td>
             <td>
               <a href="?delete=<?= $item['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove this item?')">Delete</a>
             </td>
           </tr>
         <?php endwhile; ?>
+
+        <!-- Place Order Button Row -->
+        <tr>
+          <td colspan="3" class="text-end fw-bold">Total: $<?= number_format($grandTotal, 2) ?></td>
+          <td>
+            <form method="POST">
+              <button type="submit" name="place_order" class="btn btn-success w-100">Place Order</button>
+            </form>
+          </td>
+        </tr>
       </tbody>
     </table>
-
-    <!-- Place Order -->
-    <form method="POST" class="text-end">
-      <button type="submit" name="place_order" class="btn btn-success">Place Order</button>
-    </form>
   <?php endif; ?>
 </div>
 

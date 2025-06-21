@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
   exit();
 }
 
-include 'database.php'; // Assumes $conn is defined here
+include 'database.php';
 
 $message = '';
 $editUser = null;
@@ -74,84 +74,123 @@ $users = $conn->query("SELECT * FROM users ORDER BY id DESC");
 <head>
   <meta charset="UTF-8">
   <title>Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .card {
+      border-radius: 1rem;
+    }
+    .table thead th {
+      background-color: #f1f1f1;
+    }
+  </style>
 </head>
-<body class="bg-light">
+<body>
 
 <?php include 'navbar.php'; ?>
 
-<div class="container py-4">
-  <h2 class="mb-4 text-primary">Admin Dashboard - Welcome <?= htmlspecialchars($_SESSION['user_name']) ?></h2>
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-primary">Admin Dashboard</h2>
+    <a href="logout.php" class="btn btn-outline-danger">Logout</a>
+  </div>
 
   <?php if ($message): ?>
-    <div class="alert alert-info"><?= htmlspecialchars($message) ?></div>
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+      <?= htmlspecialchars($message) ?>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
   <?php endif; ?>
 
   <!-- User Form -->
-  <form method="POST" class="card p-4 mb-4">
-    <input type="hidden" name="id" value="<?= $editUser['id'] ?? '' ?>">
-    
-    <div class="mb-3">
-      <label>Name</label>
-      <input type="text" name="name" class="form-control" value="<?= htmlspecialchars($editUser['name'] ?? '') ?>" required>
+  <div class="card shadow mb-5">
+    <div class="card-header bg-white border-bottom">
+      <h5 class="mb-0"><?= $editUser ? 'Edit User' : 'Add New User' ?></h5>
     </div>
+    <div class="card-body">
+      <form method="POST" action="admin_profile.php">
+        <input type="hidden" name="id" value="<?= $editUser['id'] ?? '' ?>">
 
-    <div class="mb-3">
-      <label>Email</label>
-      <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($editUser['email'] ?? '') ?>" required>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Full Name</label>
+            <input type="text" name="name" class="form-control" value="<?= htmlspecialchars($editUser['name'] ?? '') ?>" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" value="<?= htmlspecialchars($editUser['email'] ?? '') ?>" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Phone</label>
+            <input type="text" name="phone" class="form-control" value="<?= htmlspecialchars($editUser['phone'] ?? '') ?>" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Password <?= $editUser ? '(leave blank to keep current)' : '' ?></label>
+            <input type="password" name="password" class="form-control">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Role</label>
+            <select name="role" class="form-select" required>
+              <option value="user" <?= (isset($editUser['role']) && $editUser['role'] === 'user') ? 'selected' : '' ?>>User</option>
+              <option value="delivery" <?= (isset($editUser['role']) && $editUser['role'] === 'delivery') ? 'selected' : '' ?>>Delivery</option>
+              <option value="admin" <?= (isset($editUser['role']) && $editUser['role'] === 'admin') ? 'selected' : '' ?>>Admin</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <button type="submit" name="save" class="btn btn-success">Save</button>
+          <?php if ($editUser): ?>
+            <a href="admin_profile.php" class="btn btn-secondary ms-2">Cancel</a>
+          <?php endif; ?>
+        </div>
+      </form>
     </div>
-
-    <div class="mb-3">
-      <label>Phone</label>
-      <input type="text" name="phone" class="form-control" value="<?= htmlspecialchars($editUser['phone'] ?? '') ?>" required>
-    </div>
-
-    <div class="mb-3">
-      <label>Password <?= $editUser ? '(leave blank to keep current)' : '' ?></label>
-      <input type="password" name="password" class="form-control">
-    </div>
-
-    <div class="mb-3">
-      <label>Role</label>
-      <select name="role" class="form-control" required>
-        <option value="user" <?= (isset($editUser['role']) && $editUser['role'] === 'user') ? 'selected' : '' ?>>User</option>
-        <option value="delivery" <?= (isset($editUser['role']) && $editUser['role'] === 'delivery') ? 'selected' : '' ?>>Delivery</option>
-        <option value="admin" <?= (isset($editUser['role']) && $editUser['role'] === 'admin') ? 'selected' : '' ?>>Admin</option>
-      </select>
-    </div>
-
-    <button type="submit" name="save" class="btn btn-success">Save User</button>
-    <a href="logout.php" class="btn btn-danger float-end">Logout</a>
-  </form>
+  </div>
 
   <!-- Users Table -->
-  <h4>All Users</h4>
-  <table class="table table-bordered bg-white">
-    <thead class="table-light">
-      <tr>
-        <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php while ($user = $users->fetch_assoc()): ?>
-        <tr>
-          <td><?= $user['id'] ?></td>
-          <td><?= htmlspecialchars($user['name']) ?></td>
-          <td><?= htmlspecialchars($user['email']) ?></td>
-          <td><?= htmlspecialchars($user['phone']) ?></td>
-          <td><?= ucfirst($user['role']) ?></td>
-          <td>
-            <a href="?edit=<?= $user['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
-            <?php if ($user['id'] != $_SESSION['user_id']): ?>
-              <a href="?delete=<?= $user['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Delete this user?')">Delete</a>
-            <?php endif; ?>
-          </td>
-        </tr>
-      <?php endwhile; ?>
-    </tbody>
-  </table>
+  <div class="card shadow">
+    <div class="card-header bg-white border-bottom">
+      <h5 class="mb-0">All Users</h5>
+    </div>
+    <div class="card-body table-responsive">
+      <table class="table table-bordered align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th style="width: 140px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php while ($user = $users->fetch_assoc()): ?>
+            <tr>
+              <td><?= $user['id'] ?></td>
+              <td><?= htmlspecialchars($user['name']) ?></td>
+              <td><?= htmlspecialchars($user['email']) ?></td>
+              <td><?= htmlspecialchars($user['phone']) ?></td>
+              <td><?= ucfirst($user['role']) ?></td>
+              <td>
+                <a href="?edit=<?= $user['id'] ?>" class="btn btn-sm btn-outline-warning">Edit</a>
+                <?php if ($user['id'] != $_SESSION['user_id']): ?>
+                  <a href="?delete=<?= $user['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this user?')">Delete</a>
+                <?php endif; ?>
+              </td>
+            </tr>
+          <?php endwhile; ?>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <?php include 'footer.php'; ?>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
