@@ -27,10 +27,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           header("Location: home.php");
           break;
         case 'delivery':
-          header("Location: order.php");
+          header("Location: home.php");
           break;
         case 'admin':
-          header("Location: admindashboard.php");
+          header("Location: home.php");
           break;
       }
       exit();
