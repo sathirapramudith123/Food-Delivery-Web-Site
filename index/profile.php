@@ -147,7 +147,7 @@ if (isset($_GET['delete']) && intval($_GET['delete']) === $userId) {
   </style>
 </head>
 <body>
-<?php include 'navbar.php'; ?>
+<?php include 'header.php'; ?>
 
 <div class="container py-5">
   <div class="row justify-content-center">

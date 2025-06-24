@@ -1,6 +1,10 @@
-document.addEventListener("DOMContentLoaded", () => {
-  setTimeout(() => {
-    document.getElementById("userCount").innerText = "1,245";
-    document.getElementById("salesCount").innerText = "$23,450";
-  }, 1000);
-});
+    // Simulate data fetching
+    document.getElementById('userCount').innerText = Math.floor(Math.random() * 1000);
+
+    // Update time
+    function updateTime() {
+      const now = new Date();
+      document.getElementById('time').innerText = now.toLocaleTimeString();
+    }
+    setInterval(updateTime, 1000);
+    updateTime();

@@ -98,7 +98,7 @@ $deliveryList = $conn->query("SELECT * FROM users WHERE role = 'delivery'");
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-<?php include 'navbar.php'; ?>
+<?php include 'header.php'; ?>
 <div class="container py-4">
   <h2 class="mb-4 text-danger">Delivery Profile - Welcome <?= $_SESSION['user_name'] ?></h2>
 

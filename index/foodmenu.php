@@ -126,7 +126,7 @@ if ($result) {
 </head>
 <body>
 
-<?php include("../index/navbar.php"); ?>
+<?php include("../index/header.php"); ?>
 
 <section class="menu-section py-5">
   <div class="container">
@@ -188,13 +188,6 @@ if ($result) {
                 <div class="d-flex gap-2 flex-wrap">
                   <a href="?edit=<?= $food['id'] ?>" class="btn btn-sm btn-outline-primary" title="Edit"><i class="bi bi-pencil-square"></i></a>
                   <a href="?delete=<?= $food['id'] ?>" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this item?')" title="Delete"><i class="bi bi-trash"></i></a>
-                  <form method="POST">
-                    <input type="hidden" name="cart_food_id" value="<?= $food['id'] ?>">
-                    <input type="hidden" name="cart_quantity" value="1">
-                    <button type="submit" formaction="cart.php" class="btn btn-sm btn-success">
-                      <i class="bi bi-cart-plus-fill me-1"></i>Add to Cart
-                    </button>
-                  </form>
                 </div>
               </div>
             </div>

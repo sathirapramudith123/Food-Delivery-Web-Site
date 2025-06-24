@@ -17,7 +17,7 @@ if (session_status() === PHP_SESSION_NONE) {
           <a class="nav-link<?= basename($_SERVER['PHP_SELF']) == 'home.php' ? ' active' : '' ?>" href="home.php">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link<?= basename($_SERVER['PHP_SELF']) == 'foodmenu.php' ? ' active' : '' ?>" href="foodmenu.php">Food Menu</a>
+          <a class="nav-link<?= basename($_SERVER['PHP_SELF']) == 'foodmenu.php' ? ' active' : '' ?>" href="foodlist.php">Food Menu</a>
         </li>
 
         <?php if (isset($_SESSION['user_role'])): ?>

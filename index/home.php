@@ -19,7 +19,7 @@ if ($feedbackResult && $feedbackResult->num_rows > 0) {
 }
 ?>
 
-<?php include ("../index/navbar.php"); ?>
+<?php include ("../index/header.php"); ?>
 
 <!DOCTYPE html>
 <html lang="en">

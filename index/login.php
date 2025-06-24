@@ -68,7 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   </style>
 </head>
 <body class="d-flex flex-column min-vh-100 bg-light">
-  <?php include 'navbar.php'; ?>
+  <?php include 'header.php'; ?>
 
   <div class="container py-5 d-flex justify-content-center align-items-center flex-grow-1">
     <div class="card shadow-lg p-4" style="max-width: 400px; width: 100%;">
