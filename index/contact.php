@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
 
-<?php include("../index/navbar.php"); ?>
+<?php include("../index/header.php"); ?>
 
 <section class="contact-section py-5">
   <div class="container">

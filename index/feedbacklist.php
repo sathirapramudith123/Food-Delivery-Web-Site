@@ -50,11 +50,24 @@ if (isset($_GET['edit'])) {
     $stmt->close();
 }
 
-// Fetch all feedback to display
+// Handle search input
+$searchTerm = trim($_GET['search'] ?? '');
+
+// Fetch all feedback or filtered by search
 $feedbacks = [];
-$result = $conn->query("SELECT * FROM feedback ORDER BY created_at DESC");
-if ($result) {
+if ($searchTerm !== '') {
+    $searchTermLike = "%$searchTerm%";
+    $stmt = $conn->prepare("SELECT * FROM feedback WHERE comment LIKE ? ORDER BY created_at DESC");
+    $stmt->bind_param("s", $searchTermLike);
+    $stmt->execute();
+    $result = $stmt->get_result();
     $feedbacks = $result->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+} else {
+    $result = $conn->query("SELECT * FROM feedback ORDER BY created_at DESC");
+    if ($result) {
+        $feedbacks = $result->fetch_all(MYSQLI_ASSOC);
+    }
 }
 ?>
 
@@ -79,6 +92,21 @@ if ($result) {
   <section class="feedback-section py-5">
     <div class="container">
       <h2 class="text-danger text-center mb-4">Customer Feedback</h2>
+
+      <!-- Search Form -->
+      <form method="GET" class="mb-4 d-flex justify-content-center" style="gap:10px; max-width: 600px; margin:auto;">
+        <input
+          type="text"
+          name="search"
+          class="form-control"
+          placeholder="Search feedback..."
+          value="<?= htmlspecialchars($searchTerm) ?>"
+        />
+        <button type="submit" class="btn btn-primary">Search</button>
+        <?php if ($searchTerm !== ''): ?>
+          <a href="<?= $_SERVER['PHP_SELF'] ?>" class="btn btn-secondary">Clear</a>
+        <?php endif; ?>
+      </form>
 
       <!-- Feedback Form -->
       <form method="POST" class="row g-3 mb-4" id="feedbackForm">

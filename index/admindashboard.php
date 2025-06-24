@@ -12,9 +12,9 @@
     <a href="userstatus.php">Users</a>
     <a href="order.php">Order</a>
     <a href="foodmenu.php">Products</a>
+    <a href="feedbacklist.php">Feedback</a>
+    <a href="contactlist.php">Contact Meassage</a>
     <a href="logout.php">Logout</a>
-    <a href="feedback.php">Feedback</a>
-    <a href="contact.php">Contact Meassage</a>
   </div>
 
   <div class="main-content">
