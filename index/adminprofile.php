@@ -66,7 +66,7 @@ if (isset($_GET['delete'])) {
 }
 
 // Fetch All Users
-$users = $conn->query("SELECT * FROM users ORDER BY id DESC");
+$users = $conn->query("SELECT * FROM users ORDER BY id ASC");
 ?>
 
 <!DOCTYPE html>

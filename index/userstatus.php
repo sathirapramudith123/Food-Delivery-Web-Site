@@ -20,17 +20,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save'])) {
     $password = !empty($_POST['password']) ? password_hash($_POST['password'], PASSWORD_DEFAULT) : null;
 
     if ($id) {
-        // Update user
+        // update
         $sql = "UPDATE users SET name=?, email=?, phone=?, role=?";
         $types = "ssss";
         $params = [$name, $email, $phone, $role];
-
         if ($password) {
             $sql .= ", password=?";
             $types .= "s";
             $params[] = $password;
         }
-
         $sql .= " WHERE id=?";
         $types .= "i";
         $params[] = $id;
@@ -40,12 +38,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save'])) {
         $message = $stmt->execute() ? "User updated successfully!" : "Update failed!";
         $stmt->close();
     } else {
-        // Create new user
+        // create
         $stmt = $conn->prepare("INSERT INTO users (name, email, password, phone, role) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param("sssss", $name, $email, $password, $phone, $role);
         $message = $stmt->execute() ? "User created successfully!" : "Creation failed!";
         $stmt->close();
     }
+    header("Location: userstatus.php");
+    exit();
 }
 
 // Handle Edit
@@ -68,7 +68,7 @@ if (isset($_GET['delete'])) {
         $stmt->execute();
         $stmt->close();
     }
-    header("Location: admin_profile.php");
+    header("Location: userstatus.php");
     exit();
 }
 
@@ -131,9 +131,8 @@ if (isset($_GET['search'])) {
       <h5 class="mb-0"><?= $editUser ? 'Edit User' : 'Add New User' ?></h5>
     </div>
     <div class="card-body">
-      <form method="POST" action="admin_profile.php">
+      <form method="POST" action="userstatus.php">
         <input type="hidden" name="id" value="<?= $editUser['id'] ?? '' ?>">
-
         <div class="row g-3">
           <div class="col-md-6">
             <label class="form-label">Full Name</label>
@@ -163,18 +162,19 @@ if (isset($_GET['search'])) {
             </select>
           </div>
         </div>
-        <div class="mt-4">
-          <button type="submit" name="save" class="btn btn-success">Save</button>
-          <?php if ($editUser): ?>
-            <a href="admin_profile.php" class="btn btn-secondary ms-2">Cancel</a>
-          <?php endif; ?>
-        </div>
-      </form>
+        <form method="POST" action="userstatus.php">
+          <div class="mt-4">
+            <button type="submit" name="save" class="btn btn-success">Save</button>
+            <?php if ($editUser): ?>
+              <a href="userstatus.php" class="btn btn-secondary ms-2">Cancel</a>
+            <?php endif; ?>
+          </div>
+        </form>
     </div>
   </div>
 
   <!-- Search Form -->
-  <form class="d-flex mb-3" method="get" action="admin_profile.php">
+  <form class="d-flex mb-3" method="get" action="userstatus.php">
     <input class="form-control me-2" type="search" name="search" placeholder="Search by name or email"
            value="<?= htmlspecialchars($search) ?>">
     <button class="btn btn-outline-primary" type="submit">Search</button>
@@ -218,7 +218,6 @@ if (isset($_GET['search'])) {
       </table>
     </div>
   </div>
-
 </div>
 
 <?php include 'footer.php'; ?>
