@@ -92,10 +92,7 @@ $stmt->close();
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<? include("../index/footer.php"); ?>
+<?php include("../index/footer.php"); ?>
 </body>
 </html>
 
-<?php
-$conn->close();
-?>
