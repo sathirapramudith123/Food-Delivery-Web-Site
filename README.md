@@ -23,7 +23,7 @@ Welcome to **FoodExpress**, a responsive and interactive food delivery web appli
 
 
 ##mySQL Table 
-
+```
 CREATE TABLE cart (
     id INT AUTO_INCREMENT PRIMARY KEY,
     food_id INT NOT NULL,
@@ -90,3 +90,4 @@ CREATE TABLE contact_messages (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+```
