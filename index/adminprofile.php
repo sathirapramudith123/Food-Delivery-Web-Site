@@ -90,7 +90,7 @@ $users = $conn->query("SELECT * FROM users ORDER BY id DESC");
 </head>
 <body>
 
-<?php include 'navbar.php'; ?>
+<?php include 'header.php'; ?>
 
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
