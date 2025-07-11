@@ -1,3 +1,16 @@
+<?php
+include 'database.php';
+
+// Get user count grouped by role
+$roleCounts = [];
+$result = $conn->query("SELECT role, COUNT(*) as count FROM users GROUP BY role");
+
+while ($row = $result->fetch_assoc()) {
+    $roleCounts[$row['role']] = $row['count'];
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +26,7 @@
     <a href="order.php">Order</a>
     <a href="foodmenu.php">Products</a>
     <a href="feedbacklist.php">Feedback</a>
-    <a href="contactlist.php">Contact Meassage</a>
+    <a href="contactlist.php">Contact Message</a>
     <a href="logout.php">Logout</a>
   </div>
 
@@ -22,24 +35,16 @@
       <h1>Dashboard</h1>
       <div id="time"></div>
     </div>
-
-    <div class="cards">
-      <div class="card">
-        <h3>Users</h3>
-        <p id="userCount">Loading...</p>
-      </div>
-      <div class="card">
-        <h3>Sales</h3>
-        <p>$12,345</p>
-      </div>
-      <div class="card">
-        <h3>Performance</h3>
-        <p>87%</p>
-      </div>
+    <div class="card" style="margin-top: 40px; padding: 20px;">
+        <h3>User Roles Chart</h3>
+        <canvas id="userBarChart" height="100"></canvas>
     </div>
-  </div>
 
-  <script src="../js/admin.js"></script>
-  </script>
+  </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  window.userRoleCounts = <?= json_encode($roleCounts) ?>;
+</script>
+<script src="../js/admin.js"></script>
 </body>
 </html>
