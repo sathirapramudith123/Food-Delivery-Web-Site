@@ -33,18 +33,44 @@ while ($row = $result->fetch_assoc()) {
   <div class="main-content">
     <div class="header">
       <h1>Dashboard</h1>
-      <div id="time"></div>
     </div>
     <div class="card" style="margin-top: 40px; padding: 20px;">
         <h3>User Roles Chart</h3>
-        <canvas id="userBarChart" height="100"></canvas>
+        <canvas id="userBarChart" width="400" height="100"></canvas>
     </div>
 
   </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  window.userRoleCounts = <?= json_encode($roleCounts) ?>;
+  // Convert PHP array to JS object
+  const userRoleCounts = <?= json_encode($roleCounts) ?>;
+
+  const ctx = document.getElementById('userBarChart').getContext('2d');
+
+  const chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(userRoleCounts), // e.g., ["admin", "user", "delivery"]
+      datasets: [{
+        label: 'User Count',
+        data: Object.values(userRoleCounts), // e.g., [2, 10, 5]
+        backgroundColor: ['#3498db', '#2ecc71', '#e67e22'],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            precision: 0
+          }
+        }
+      }
+    }
+  });
 </script>
+
 <script src="../js/admin.js"></script>
 </body>
 </html>
