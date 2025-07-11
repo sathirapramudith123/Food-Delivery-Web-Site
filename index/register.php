@@ -91,7 +91,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <select name="regRole" id="regRole" class="form-select" required>
           <option value="user">User</option>
           <option value="delivery">Delivery Member</option>
-          <option value="admin">Admin</option>
         </select>
       </div>
       <button type="submit" class="btn btn-danger w-100">Register</button>
