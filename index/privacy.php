@@ -9,7 +9,7 @@
 </head>
 <body>
 
-<?php include ("../index/navbar.php"); ?>
+<?php include ("../index/header.php"); ?>
 
   <!-- Privacy Policy Content -->
   <section class="privacy-section py-5">
