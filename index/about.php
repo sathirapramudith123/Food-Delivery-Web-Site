@@ -1,4 +1,4 @@
-<?php include ("../index/navbar.php"); ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="../style/about.css" />
 </head>
 <body>
-
+  <?php include ("../index/header.php"); ?>
 
 
   <!-- About Section -->
